@@ -1,0 +1,4 @@
+[lp]
+keystore = "./eth-ks/<your-test-account>.json"
+passphrase = "<your-password>"
+releasenative = false
