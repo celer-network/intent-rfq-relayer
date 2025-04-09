@@ -33,7 +33,7 @@ var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 var _ = metadata.Join
 
-func request_RfqServerApi_PendingOrders_0(ctx context.Context, marshaler runtime.Marshaler, client RfqServerApiClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MMApi_PendingOrders_0(ctx context.Context, marshaler runtime.Marshaler, client MMApiClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq PendingOrdersRequest
 	var metadata runtime.ServerMetadata
 
@@ -50,7 +50,7 @@ func request_RfqServerApi_PendingOrders_0(ctx context.Context, marshaler runtime
 
 }
 
-func local_request_RfqServerApi_PendingOrders_0(ctx context.Context, marshaler runtime.Marshaler, server RfqServerApiServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MMApi_PendingOrders_0(ctx context.Context, marshaler runtime.Marshaler, server MMApiServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq PendingOrdersRequest
 	var metadata runtime.ServerMetadata
 
@@ -67,7 +67,7 @@ func local_request_RfqServerApi_PendingOrders_0(ctx context.Context, marshaler r
 
 }
 
-func request_RfqServerApi_UpdateOrders_0(ctx context.Context, marshaler runtime.Marshaler, client RfqServerApiClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MMApi_UpdateOrders_0(ctx context.Context, marshaler runtime.Marshaler, client MMApiClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateOrdersRequest
 	var metadata runtime.ServerMetadata
 
@@ -84,7 +84,7 @@ func request_RfqServerApi_UpdateOrders_0(ctx context.Context, marshaler runtime.
 
 }
 
-func local_request_RfqServerApi_UpdateOrders_0(ctx context.Context, marshaler runtime.Marshaler, server RfqServerApiServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MMApi_UpdateOrders_0(ctx context.Context, marshaler runtime.Marshaler, server MMApiServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateOrdersRequest
 	var metadata runtime.ServerMetadata
 
@@ -101,7 +101,7 @@ func local_request_RfqServerApi_UpdateOrders_0(ctx context.Context, marshaler ru
 
 }
 
-func request_RfqServerApi_UpdateConfigs_0(ctx context.Context, marshaler runtime.Marshaler, client RfqServerApiClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MMApi_UpdateConfigs_0(ctx context.Context, marshaler runtime.Marshaler, client MMApiClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateConfigsRequest
 	var metadata runtime.ServerMetadata
 
@@ -118,7 +118,7 @@ func request_RfqServerApi_UpdateConfigs_0(ctx context.Context, marshaler runtime
 
 }
 
-func local_request_RfqServerApi_UpdateConfigs_0(ctx context.Context, marshaler runtime.Marshaler, server RfqServerApiServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MMApi_UpdateConfigs_0(ctx context.Context, marshaler runtime.Marshaler, server MMApiServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateConfigsRequest
 	var metadata runtime.ServerMetadata
 
@@ -135,13 +135,13 @@ func local_request_RfqServerApi_UpdateConfigs_0(ctx context.Context, marshaler r
 
 }
 
-// RegisterRfqServerApiHandlerServer registers the http handlers for service RfqServerApi to "mux".
-// UnaryRPC     :call RfqServerApiServer directly.
+// RegisterMMApiHandlerServer registers the http handlers for service MMApi to "mux".
+// UnaryRPC     :call MMApiServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterRfqServerApiHandlerFromEndpoint instead.
-func RegisterRfqServerApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, server RfqServerApiServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterMMApiHandlerFromEndpoint instead.
+func RegisterMMApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, server MMApiServer) error {
 
-	mux.Handle("POST", pattern_RfqServerApi_PendingOrders_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_MMApi_PendingOrders_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -152,7 +152,7 @@ func RegisterRfqServerApiHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_RfqServerApi_PendingOrders_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MMApi_PendingOrders_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -160,11 +160,11 @@ func RegisterRfqServerApiHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_RfqServerApi_PendingOrders_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MMApi_PendingOrders_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_RfqServerApi_UpdateOrders_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_MMApi_UpdateOrders_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -175,7 +175,7 @@ func RegisterRfqServerApiHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_RfqServerApi_UpdateOrders_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MMApi_UpdateOrders_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -183,11 +183,11 @@ func RegisterRfqServerApiHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_RfqServerApi_UpdateOrders_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MMApi_UpdateOrders_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_RfqServerApi_UpdateConfigs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_MMApi_UpdateConfigs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -198,7 +198,7 @@ func RegisterRfqServerApiHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_RfqServerApi_UpdateConfigs_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MMApi_UpdateConfigs_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -206,16 +206,16 @@ func RegisterRfqServerApiHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_RfqServerApi_UpdateConfigs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MMApi_UpdateConfigs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterRfqServerApiHandlerFromEndpoint is same as RegisterRfqServerApiHandler but
+// RegisterMMApiHandlerFromEndpoint is same as RegisterMMApiHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterRfqServerApiHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterMMApiHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -235,23 +235,23 @@ func RegisterRfqServerApiHandlerFromEndpoint(ctx context.Context, mux *runtime.S
 		}()
 	}()
 
-	return RegisterRfqServerApiHandler(ctx, mux, conn)
+	return RegisterMMApiHandler(ctx, mux, conn)
 }
 
-// RegisterRfqServerApiHandler registers the http handlers for service RfqServerApi to "mux".
+// RegisterMMApiHandler registers the http handlers for service MMApi to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterRfqServerApiHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterRfqServerApiHandlerClient(ctx, mux, NewRfqServerApiClient(conn))
+func RegisterMMApiHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterMMApiHandlerClient(ctx, mux, NewMMApiClient(conn))
 }
 
-// RegisterRfqServerApiHandlerClient registers the http handlers for service RfqServerApi
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "RfqServerApiClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "RfqServerApiClient"
+// RegisterMMApiHandlerClient registers the http handlers for service MMApi
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "MMApiClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "MMApiClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "RfqServerApiClient" to call the correct interceptors.
-func RegisterRfqServerApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, client RfqServerApiClient) error {
+// "MMApiClient" to call the correct interceptors.
+func RegisterMMApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, client MMApiClient) error {
 
-	mux.Handle("POST", pattern_RfqServerApi_PendingOrders_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_MMApi_PendingOrders_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -260,18 +260,18 @@ func RegisterRfqServerApiHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_RfqServerApi_PendingOrders_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MMApi_PendingOrders_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_RfqServerApi_PendingOrders_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MMApi_PendingOrders_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_RfqServerApi_UpdateOrders_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_MMApi_UpdateOrders_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -280,18 +280,18 @@ func RegisterRfqServerApiHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_RfqServerApi_UpdateOrders_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MMApi_UpdateOrders_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_RfqServerApi_UpdateOrders_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MMApi_UpdateOrders_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_RfqServerApi_UpdateConfigs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_MMApi_UpdateConfigs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -300,14 +300,14 @@ func RegisterRfqServerApiHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_RfqServerApi_UpdateConfigs_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MMApi_UpdateConfigs_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_RfqServerApi_UpdateConfigs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MMApi_UpdateConfigs_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -315,17 +315,17 @@ func RegisterRfqServerApiHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_RfqServerApi_PendingOrders_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "mm", "getPendingOrders"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_MMApi_PendingOrders_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "mm", "getPendingOrders"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_RfqServerApi_UpdateOrders_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "mm", "updateOrders"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_MMApi_UpdateOrders_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "mm", "updateOrders"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_RfqServerApi_UpdateConfigs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "mm", "updateConfigs"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_MMApi_UpdateConfigs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "mm", "updateConfigs"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_RfqServerApi_PendingOrders_0 = runtime.ForwardResponseMessage
+	forward_MMApi_PendingOrders_0 = runtime.ForwardResponseMessage
 
-	forward_RfqServerApi_UpdateOrders_0 = runtime.ForwardResponseMessage
+	forward_MMApi_UpdateOrders_0 = runtime.ForwardResponseMessage
 
-	forward_RfqServerApi_UpdateConfigs_0 = runtime.ForwardResponseMessage
+	forward_MMApi_UpdateConfigs_0 = runtime.ForwardResponseMessage
 )

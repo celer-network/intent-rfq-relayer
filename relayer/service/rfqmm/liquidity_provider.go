@@ -27,8 +27,6 @@ const (
 	TPPolicyPrefixOneOf  = "OneOf="
 )
 
-var _ LiquidityProvider = &DefaultLiquidityProvider{}
-
 type DefaultLiquidityProvider struct {
 	paused       bool
 	txrs         map[uint64]*ethutils.Transactor
@@ -60,8 +58,6 @@ func NewDefaultLiquidityProvider(cm *ChainManager, config *LPConfig) *DefaultLiq
 		lp.txrs[chainId] = ethutils.NewTransactorByExternalSigner(addr, signer, chain.Client, big.NewInt(int64(chain.ChainId)), chain.TxOptions...)
 	}
 
-	// approve to rfq contract
-	// lp.approveERC20ToRfq()
 	return lp
 }
 
@@ -150,21 +146,15 @@ func (d DefaultLiquidityProvider) UnfreezeLiquidity(chainId uint64, hash eth.Has
 	return d.liqManager.UnfreezeLiquidity(chainId, hash)
 }
 
-func (d *DefaultLiquidityProvider) DstTransfer(transferNative bool, _quote rfq.RFQQuote, opts ...ethutils.TxOption) (eth.Hash, error) {
+func (d *DefaultLiquidityProvider) DstTransfer(transferNative bool, _quote rfq.RFQQuote, sig []byte, opts ...ethutils.TxOption) (eth.Hash, error) {
 	if d.paused {
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, "liquidity provider is paused due to some serious error")
 	}
-	quoteHash := _quote.Hash()
 	// check if it's a same chain swap
 	if _quote.DstChainId == _quote.SrcChainId {
-		return d.sameChainTransfer(transferNative, _quote, opts...)
+		return d.sameChainTransfer(transferNative, _quote, sig, opts...)
 	}
 	chain, err := d.chainManager.GetChain(_quote.DstChainId)
-	if err != nil {
-		return eth.ZeroHash, err
-	}
-	// confirm liquidity before dst transfer
-	err = d.confirmLiquidity(_quote.DstChainId, _quote.DstToken, _quote.DstAmount, int64(_quote.Deadline), quoteHash, transferNative)
 	if err != nil {
 		return eth.ZeroHash, err
 	}
@@ -180,7 +170,7 @@ func (d *DefaultLiquidityProvider) DstTransfer(transferNative bool, _quote rfq.R
 		opts = append(opts, ethutils.WithEthValue(new(big.Int).Add(_quote.DstAmount, chain.MsgFee)))
 	} else {
 		method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
-			return chain.RfqContract.DstTransfer(opts, _quote)
+			return chain.RfqContract.DstTransferWithSig(opts, _quote, sig)
 		}
 		opts = append(opts, ethutils.WithEthValue(chain.MsgFee))
 	}
@@ -228,17 +218,12 @@ func (d *DefaultLiquidityProvider) SrcRelease(_quote rfq.RFQQuote, _execMsgCallD
 	return tx.Hash(), nil
 }
 
-func (d *DefaultLiquidityProvider) sameChainTransfer(transferNative bool, _quote rfq.RFQQuote, opts ...ethutils.TxOption) (eth.Hash, error) {
+func (d *DefaultLiquidityProvider) sameChainTransfer(transferNative bool, _quote rfq.RFQQuote, sig []byte, opts ...ethutils.TxOption) (eth.Hash, error) {
 	chain, err := d.chainManager.GetChain(_quote.DstChainId)
 	if err != nil {
 		return eth.ZeroHash, err
 	}
-	quoteHash := _quote.Hash()
 	// confirm liquidity before same chain transfer
-	err = d.confirmLiquidity(_quote.DstChainId, _quote.DstToken, _quote.DstAmount, int64(_quote.Deadline), quoteHash, transferNative)
-	if err != nil {
-		return eth.ZeroHash, err
-	}
 	txr, ok := d.txrs[_quote.DstChainId]
 	if !ok {
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, fmt.Sprintf("no transactor for chain %d", _quote.DstChainId))
@@ -259,7 +244,7 @@ func (d *DefaultLiquidityProvider) sameChainTransfer(transferNative bool, _quote
 		opts = append(opts, ethutils.WithEthValue(_quote.DstAmount))
 	} else {
 		method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
-			return chain.RfqContract.SameChainTransfer(opts, _quote, releaseNative)
+			return chain.RfqContract.SameChainTransferWithSig(opts, _quote, releaseNative, sig)
 		}
 	}
 	tx, err := txr.Transact(

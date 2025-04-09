@@ -30,11 +30,6 @@ type LiqManager struct {
 	LPs map[uint64]*LiqProvider
 }
 
-func NewLiqManager(config *LPConfig) *LiqManager {
-	lp := NewLiqProvider(config)
-	return &LiqManager{LP: lp}
-}
-
 func (d *LiqManager) GetLiqNeedApprove(chainId uint64) ([]*common.Token, []*big.Int, error) {
 	lp, err := d.GetLP(chainId)
 	if err != nil {
@@ -207,22 +202,6 @@ type LiquidityConfig struct {
 	Approve    string
 	Decimals   int32
 	FreezeTime int64
-}
-
-func NewLiqProvider(config *LPConfig) *LiqProvider {
-	signer, addr, err := createSigner(config.Keystore, config.Passphrase, big.NewInt(int64(config.ChainId)))
-	if err != nil {
-		panic(err)
-	}
-	return &LiqProvider{
-		signer:        signer,
-		chainId:       config.ChainId,
-		address:       addr,
-		liqs:          liqs,
-		liqOps:        make([]*LiqOpDetail, 0),
-		hashToUntil:   make(map[eth.Hash]int64),
-		releaseNative: config.ReleaseNative,
-	}
 }
 
 func (lp *LiqProvider) log() {

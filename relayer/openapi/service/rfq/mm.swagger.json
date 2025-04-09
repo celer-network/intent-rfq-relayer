@@ -6,7 +6,7 @@
   },
   "tags": [
     {
-      "name": "RfqServerApi"
+      "name": "MMApi"
     }
   ],
   "consumes": [
@@ -19,7 +19,7 @@
     "/v1/mm/getPendingOrders": {
       "post": {
         "summary": "APIs for market makers. All rpc methods require API key authentication.",
-        "operationId": "RfqServerApi_PendingOrders",
+        "operationId": "MMApi_PendingOrders",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -45,13 +45,13 @@
           }
         ],
         "tags": [
-          "RfqServerApi"
+          "MMApi"
         ]
       }
     },
     "/v1/mm/updateConfigs": {
       "post": {
-        "operationId": "RfqServerApi_UpdateConfigs",
+        "operationId": "MMApi_UpdateConfigs",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -77,13 +77,13 @@
           }
         ],
         "tags": [
-          "RfqServerApi"
+          "MMApi"
         ]
       }
     },
     "/v1/mm/updateOrders": {
       "post": {
-        "operationId": "RfqServerApi_UpdateOrders",
+        "operationId": "MMApi_UpdateOrders",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -109,7 +109,7 @@
           }
         ],
         "tags": [
-          "RfqServerApi"
+          "MMApi"
         ]
       }
     }

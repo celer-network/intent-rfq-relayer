@@ -8,7 +8,7 @@ import (
 )
 
 type Client struct {
-	proto.RfqServerApiClient
+	proto.MMApiClient
 	server string
 	conn   *grpc.ClientConn
 }
@@ -39,8 +39,8 @@ func NewClient(server string, apiKey string, ops ...grpc.DialOption) *Client {
 	if err != nil {
 		panic(err)
 	}
-	client := proto.NewRfqServerApiClient(conn)
-	return &Client{server: server, conn: conn, RfqServerApiClient: client}
+	client := proto.NewMMApiClient(conn)
+	return &Client{server: server, conn: conn, MMApiClient: client}
 }
 
 func (c *Client) Close() {

@@ -18,158 +18,158 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// RfqServerApiClient is the client API for RfqServerApi service.
+// MMApiClient is the client API for MMApi service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type RfqServerApiClient interface {
+type MMApiClient interface {
 	// APIs for market makers. All rpc methods require API key authentication.
 	PendingOrders(ctx context.Context, in *PendingOrdersRequest, opts ...grpc.CallOption) (*PendingOrdersResponse, error)
 	UpdateOrders(ctx context.Context, in *UpdateOrdersRequest, opts ...grpc.CallOption) (*UpdateOrdersResponse, error)
 	UpdateConfigs(ctx context.Context, in *UpdateConfigsRequest, opts ...grpc.CallOption) (*UpdateConfigsResponse, error)
 }
 
-type rfqServerApiClient struct {
+type mMApiClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewRfqServerApiClient(cc grpc.ClientConnInterface) RfqServerApiClient {
-	return &rfqServerApiClient{cc}
+func NewMMApiClient(cc grpc.ClientConnInterface) MMApiClient {
+	return &mMApiClient{cc}
 }
 
-func (c *rfqServerApiClient) PendingOrders(ctx context.Context, in *PendingOrdersRequest, opts ...grpc.CallOption) (*PendingOrdersResponse, error) {
+func (c *mMApiClient) PendingOrders(ctx context.Context, in *PendingOrdersRequest, opts ...grpc.CallOption) (*PendingOrdersResponse, error) {
 	out := new(PendingOrdersResponse)
-	err := c.cc.Invoke(ctx, "/service.rfq.RfqServerApi/PendingOrders", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/service.rfq.MMApi/PendingOrders", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *rfqServerApiClient) UpdateOrders(ctx context.Context, in *UpdateOrdersRequest, opts ...grpc.CallOption) (*UpdateOrdersResponse, error) {
+func (c *mMApiClient) UpdateOrders(ctx context.Context, in *UpdateOrdersRequest, opts ...grpc.CallOption) (*UpdateOrdersResponse, error) {
 	out := new(UpdateOrdersResponse)
-	err := c.cc.Invoke(ctx, "/service.rfq.RfqServerApi/UpdateOrders", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/service.rfq.MMApi/UpdateOrders", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *rfqServerApiClient) UpdateConfigs(ctx context.Context, in *UpdateConfigsRequest, opts ...grpc.CallOption) (*UpdateConfigsResponse, error) {
+func (c *mMApiClient) UpdateConfigs(ctx context.Context, in *UpdateConfigsRequest, opts ...grpc.CallOption) (*UpdateConfigsResponse, error) {
 	out := new(UpdateConfigsResponse)
-	err := c.cc.Invoke(ctx, "/service.rfq.RfqServerApi/UpdateConfigs", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/service.rfq.MMApi/UpdateConfigs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// RfqServerApiServer is the server API for RfqServerApi service.
-// All implementations should embed UnimplementedRfqServerApiServer
+// MMApiServer is the server API for MMApi service.
+// All implementations should embed UnimplementedMMApiServer
 // for forward compatibility
-type RfqServerApiServer interface {
+type MMApiServer interface {
 	// APIs for market makers. All rpc methods require API key authentication.
 	PendingOrders(context.Context, *PendingOrdersRequest) (*PendingOrdersResponse, error)
 	UpdateOrders(context.Context, *UpdateOrdersRequest) (*UpdateOrdersResponse, error)
 	UpdateConfigs(context.Context, *UpdateConfigsRequest) (*UpdateConfigsResponse, error)
 }
 
-// UnimplementedRfqServerApiServer should be embedded to have forward compatible implementations.
-type UnimplementedRfqServerApiServer struct {
+// UnimplementedMMApiServer should be embedded to have forward compatible implementations.
+type UnimplementedMMApiServer struct {
 }
 
-func (UnimplementedRfqServerApiServer) PendingOrders(context.Context, *PendingOrdersRequest) (*PendingOrdersResponse, error) {
+func (UnimplementedMMApiServer) PendingOrders(context.Context, *PendingOrdersRequest) (*PendingOrdersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PendingOrders not implemented")
 }
-func (UnimplementedRfqServerApiServer) UpdateOrders(context.Context, *UpdateOrdersRequest) (*UpdateOrdersResponse, error) {
+func (UnimplementedMMApiServer) UpdateOrders(context.Context, *UpdateOrdersRequest) (*UpdateOrdersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateOrders not implemented")
 }
-func (UnimplementedRfqServerApiServer) UpdateConfigs(context.Context, *UpdateConfigsRequest) (*UpdateConfigsResponse, error) {
+func (UnimplementedMMApiServer) UpdateConfigs(context.Context, *UpdateConfigsRequest) (*UpdateConfigsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateConfigs not implemented")
 }
 
-// UnsafeRfqServerApiServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to RfqServerApiServer will
+// UnsafeMMApiServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to MMApiServer will
 // result in compilation errors.
-type UnsafeRfqServerApiServer interface {
-	mustEmbedUnimplementedRfqServerApiServer()
+type UnsafeMMApiServer interface {
+	mustEmbedUnimplementedMMApiServer()
 }
 
-func RegisterRfqServerApiServer(s grpc.ServiceRegistrar, srv RfqServerApiServer) {
-	s.RegisterService(&RfqServerApi_ServiceDesc, srv)
+func RegisterMMApiServer(s grpc.ServiceRegistrar, srv MMApiServer) {
+	s.RegisterService(&MMApi_ServiceDesc, srv)
 }
 
-func _RfqServerApi_PendingOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MMApi_PendingOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PendingOrdersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RfqServerApiServer).PendingOrders(ctx, in)
+		return srv.(MMApiServer).PendingOrders(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/service.rfq.RfqServerApi/PendingOrders",
+		FullMethod: "/service.rfq.MMApi/PendingOrders",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RfqServerApiServer).PendingOrders(ctx, req.(*PendingOrdersRequest))
+		return srv.(MMApiServer).PendingOrders(ctx, req.(*PendingOrdersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RfqServerApi_UpdateOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MMApi_UpdateOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateOrdersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RfqServerApiServer).UpdateOrders(ctx, in)
+		return srv.(MMApiServer).UpdateOrders(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/service.rfq.RfqServerApi/UpdateOrders",
+		FullMethod: "/service.rfq.MMApi/UpdateOrders",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RfqServerApiServer).UpdateOrders(ctx, req.(*UpdateOrdersRequest))
+		return srv.(MMApiServer).UpdateOrders(ctx, req.(*UpdateOrdersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RfqServerApi_UpdateConfigs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MMApi_UpdateConfigs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateConfigsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RfqServerApiServer).UpdateConfigs(ctx, in)
+		return srv.(MMApiServer).UpdateConfigs(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/service.rfq.RfqServerApi/UpdateConfigs",
+		FullMethod: "/service.rfq.MMApi/UpdateConfigs",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RfqServerApiServer).UpdateConfigs(ctx, req.(*UpdateConfigsRequest))
+		return srv.(MMApiServer).UpdateConfigs(ctx, req.(*UpdateConfigsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// RfqServerApi_ServiceDesc is the grpc.ServiceDesc for RfqServerApi service.
+// MMApi_ServiceDesc is the grpc.ServiceDesc for MMApi service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var RfqServerApi_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "service.rfq.RfqServerApi",
-	HandlerType: (*RfqServerApiServer)(nil),
+var MMApi_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "service.rfq.MMApi",
+	HandlerType: (*MMApiServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "PendingOrders",
-			Handler:    _RfqServerApi_PendingOrders_Handler,
+			Handler:    _MMApi_PendingOrders_Handler,
 		},
 		{
 			MethodName: "UpdateOrders",
-			Handler:    _RfqServerApi_UpdateOrders_Handler,
+			Handler:    _MMApi_UpdateOrders_Handler,
 		},
 		{
 			MethodName: "UpdateConfigs",
-			Handler:    _RfqServerApi_UpdateConfigs_Handler,
+			Handler:    _MMApi_UpdateConfigs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

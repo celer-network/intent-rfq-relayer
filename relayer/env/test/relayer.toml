@@ -13,5 +13,5 @@ port = 6676
 priceValidPeriod = 300
 dstTransferPeriod = 600
 # if faled to report token configs to rfq server, mm will be stucked and retry every <reportRetryPeriod> seconds until success.
-reportRetryPeriod = 5
+reportRetryPeriod = 180
 processPeriod = 5

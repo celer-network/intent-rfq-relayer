@@ -18,120 +18,228 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// RfqMmApiClient is the client API for RfqMmApi service.
+// ApiClient is the client API for Api service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type RfqMmApiClient interface {
+type ApiClient interface {
 	Price(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error)
 	Quote(ctx context.Context, in *QuoteRequest, opts ...grpc.CallOption) (*QuoteResponse, error)
+	Sign(ctx context.Context, in *SignRequest, opts ...grpc.CallOption) (*SignResponse, error)
+	Verify(ctx context.Context, in *VerifyRequest, opts ...grpc.CallOption) (*VerifyResponse, error)
+	Tokens(ctx context.Context, in *TokensRequest, opts ...grpc.CallOption) (*TokensResponse, error)
 }
 
-type rfqMmApiClient struct {
+type apiClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewRfqMmApiClient(cc grpc.ClientConnInterface) RfqMmApiClient {
-	return &rfqMmApiClient{cc}
+func NewApiClient(cc grpc.ClientConnInterface) ApiClient {
+	return &apiClient{cc}
 }
 
-func (c *rfqMmApiClient) Price(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error) {
+func (c *apiClient) Price(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error) {
 	out := new(PriceResponse)
-	err := c.cc.Invoke(ctx, "/service.rfqmm.RfqMmApi/Price", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/service.rfqmm.api/Price", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *rfqMmApiClient) Quote(ctx context.Context, in *QuoteRequest, opts ...grpc.CallOption) (*QuoteResponse, error) {
+func (c *apiClient) Quote(ctx context.Context, in *QuoteRequest, opts ...grpc.CallOption) (*QuoteResponse, error) {
 	out := new(QuoteResponse)
-	err := c.cc.Invoke(ctx, "/service.rfqmm.RfqMmApi/Quote", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/service.rfqmm.api/Quote", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// RfqMmApiServer is the server API for RfqMmApi service.
-// All implementations should embed UnimplementedRfqMmApiServer
+func (c *apiClient) Sign(ctx context.Context, in *SignRequest, opts ...grpc.CallOption) (*SignResponse, error) {
+	out := new(SignResponse)
+	err := c.cc.Invoke(ctx, "/service.rfqmm.api/Sign", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *apiClient) Verify(ctx context.Context, in *VerifyRequest, opts ...grpc.CallOption) (*VerifyResponse, error) {
+	out := new(VerifyResponse)
+	err := c.cc.Invoke(ctx, "/service.rfqmm.api/Verify", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *apiClient) Tokens(ctx context.Context, in *TokensRequest, opts ...grpc.CallOption) (*TokensResponse, error) {
+	out := new(TokensResponse)
+	err := c.cc.Invoke(ctx, "/service.rfqmm.api/Tokens", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ApiServer is the server API for Api service.
+// All implementations should embed UnimplementedApiServer
 // for forward compatibility
-type RfqMmApiServer interface {
+type ApiServer interface {
 	Price(context.Context, *PriceRequest) (*PriceResponse, error)
 	Quote(context.Context, *QuoteRequest) (*QuoteResponse, error)
+	Sign(context.Context, *SignRequest) (*SignResponse, error)
+	Verify(context.Context, *VerifyRequest) (*VerifyResponse, error)
+	Tokens(context.Context, *TokensRequest) (*TokensResponse, error)
 }
 
-// UnimplementedRfqMmApiServer should be embedded to have forward compatible implementations.
-type UnimplementedRfqMmApiServer struct {
+// UnimplementedApiServer should be embedded to have forward compatible implementations.
+type UnimplementedApiServer struct {
 }
 
-func (UnimplementedRfqMmApiServer) Price(context.Context, *PriceRequest) (*PriceResponse, error) {
+func (UnimplementedApiServer) Price(context.Context, *PriceRequest) (*PriceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Price not implemented")
 }
-func (UnimplementedRfqMmApiServer) Quote(context.Context, *QuoteRequest) (*QuoteResponse, error) {
+func (UnimplementedApiServer) Quote(context.Context, *QuoteRequest) (*QuoteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Quote not implemented")
 }
+func (UnimplementedApiServer) Sign(context.Context, *SignRequest) (*SignResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Sign not implemented")
+}
+func (UnimplementedApiServer) Verify(context.Context, *VerifyRequest) (*VerifyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Verify not implemented")
+}
+func (UnimplementedApiServer) Tokens(context.Context, *TokensRequest) (*TokensResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Tokens not implemented")
+}
 
-// UnsafeRfqMmApiServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to RfqMmApiServer will
+// UnsafeApiServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ApiServer will
 // result in compilation errors.
-type UnsafeRfqMmApiServer interface {
-	mustEmbedUnimplementedRfqMmApiServer()
+type UnsafeApiServer interface {
+	mustEmbedUnimplementedApiServer()
 }
 
-func RegisterRfqMmApiServer(s grpc.ServiceRegistrar, srv RfqMmApiServer) {
-	s.RegisterService(&RfqMmApi_ServiceDesc, srv)
+func RegisterApiServer(s grpc.ServiceRegistrar, srv ApiServer) {
+	s.RegisterService(&Api_ServiceDesc, srv)
 }
 
-func _RfqMmApi_Price_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Api_Price_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PriceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RfqMmApiServer).Price(ctx, in)
+		return srv.(ApiServer).Price(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/service.rfqmm.RfqMmApi/Price",
+		FullMethod: "/service.rfqmm.api/Price",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RfqMmApiServer).Price(ctx, req.(*PriceRequest))
+		return srv.(ApiServer).Price(ctx, req.(*PriceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RfqMmApi_Quote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Api_Quote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QuoteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RfqMmApiServer).Quote(ctx, in)
+		return srv.(ApiServer).Quote(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/service.rfqmm.RfqMmApi/Quote",
+		FullMethod: "/service.rfqmm.api/Quote",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RfqMmApiServer).Quote(ctx, req.(*QuoteRequest))
+		return srv.(ApiServer).Quote(ctx, req.(*QuoteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// RfqMmApi_ServiceDesc is the grpc.ServiceDesc for RfqMmApi service.
+func _Api_Sign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApiServer).Sign(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/service.rfqmm.api/Sign",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApiServer).Sign(ctx, req.(*SignRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Api_Verify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApiServer).Verify(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/service.rfqmm.api/Verify",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApiServer).Verify(ctx, req.(*VerifyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Api_Tokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TokensRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApiServer).Tokens(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/service.rfqmm.api/Tokens",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApiServer).Tokens(ctx, req.(*TokensRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Api_ServiceDesc is the grpc.ServiceDesc for Api service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var RfqMmApi_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "service.rfqmm.RfqMmApi",
-	HandlerType: (*RfqMmApiServer)(nil),
+var Api_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "service.rfqmm.api",
+	HandlerType: (*ApiServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Price",
-			Handler:    _RfqMmApi_Price_Handler,
+			Handler:    _Api_Price_Handler,
 		},
 		{
 			MethodName: "Quote",
-			Handler:    _RfqMmApi_Quote_Handler,
+			Handler:    _Api_Quote_Handler,
+		},
+		{
+			MethodName: "Sign",
+			Handler:    _Api_Sign_Handler,
+		},
+		{
+			MethodName: "Verify",
+			Handler:    _Api_Verify_Handler,
+		},
+		{
+			MethodName: "Tokens",
+			Handler:    _Api_Tokens_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

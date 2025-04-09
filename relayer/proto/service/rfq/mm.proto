@@ -9,7 +9,7 @@ import "google/api/annotations.proto";
 import "service/rfq/model.proto";
 import "service/rfqmm/api.proto";
 
-service RfqServerApi {
+service MMApi {
   // APIs for market makers. All rpc methods require API key authentication.
   rpc PendingOrders(PendingOrdersRequest) returns (PendingOrdersResponse) {
     option (google.api.http) = {
