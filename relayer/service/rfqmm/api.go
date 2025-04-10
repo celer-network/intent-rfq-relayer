@@ -2,16 +2,12 @@ package rfqmm
 
 import (
 	"context"
+	"google.golang.org/grpc"
 	"math/big"
 	"time"
 
-	"github.com/celer-network/goutils/log"
-	"github.com/celer-network/peti-rfq-relayer/relayer/eth"
 	"github.com/celer-network/peti-rfq-relayer/relayer/service/rfqmm/proto"
-	"google.golang.org/grpc"
 )
-
-const BestPeriodMultiplier = 1.2
 
 func (c *Client) Price(ctx context.Context, in *proto.PriceRequest, opts ...grpc.CallOption) (*proto.PriceResponse, error) {
 	if ok, reason := validatePriceRequest(in); !ok {
@@ -25,122 +21,6 @@ func (c *Client) Quote(ctx context.Context, in *proto.QuoteRequest, opts ...grpc
 		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_INVALID_ARGUMENTS, reason).ToCommonErr()}, nil
 	}
 	return c.ApiClient.Quote(ctx, in, opts...)
-}
-
-func (s *Server) Price(ctx context.Context, request *proto.PriceRequest) (response *proto.PriceResponse, err error) {
-	// uncomment it out for easy debugging
-	// defer func() {
-	//	if response.Err == nil {
-	//		log.Infof("Price with success, price %s", response.Price.String())
-	//	} else {
-	//		log.Errorf("Price with failure, err:%s, request %s", response.Err.String(), request.String())
-	//	}
-	// }()
-	if ok, reason := validatePriceRequest(request); !ok {
-		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_INVALID_ARGUMENTS, reason).ToCommonErr()}, nil
-	}
-	if !s.LiquidityProvider.HasTokenPair(request.SrcToken, request.DstToken) {
-		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_INVALID_ARGUMENTS, "unsupported token pair").ToCommonErr()}, nil
-	}
-	sendAmount := new(big.Int)
-	releaseAmount := new(big.Int)
-	receiveAmount := new(big.Int)
-	fee := new(big.Int)
-	// switch mod, one is sendAmt => receiveAmt, the other one is receiveAmt => sendAmt
-	if request.SrcAmount == "" {
-		// todo, not supported now
-		receiveAmount.SetString(request.DstAmount, 10)
-		sendAmount, releaseAmount, fee, err = s.AmountCalculator.CalSendAmt(request.SrcToken, request.DstToken, receiveAmount)
-		if err != nil {
-			return &proto.PriceResponse{Err: err.(*proto.Err).ToCommonErr()}, nil
-		}
-	} else {
-		sendAmount.SetString(request.SrcAmount, 10)
-		receiveAmount, releaseAmount, fee, err = s.AmountCalculator.CalRecvAmt(request.SrcToken, request.DstToken, sendAmount)
-		if err != nil {
-			return &proto.PriceResponse{Err: err.(*proto.Err).ToCommonErr()}, nil
-		}
-	}
-	mmAddr, err := s.LiquidityProvider.GetLiquidityProviderAddr(request.SrcToken.ChainId)
-	if err != nil {
-		return &proto.PriceResponse{Err: err.(*proto.Err).ToCommonErr()}, nil
-	}
-	dstTokenAddr := request.DstToken.GetAddr()
-	freezeTime, err := s.LiquidityProvider.AskForFreezing(request.DstToken.ChainId, dstTokenAddr, receiveAmount, request.DstNative)
-	if err != nil {
-		return &proto.PriceResponse{Err: err.(*proto.Err).ToCommonErr()}, nil
-	}
-
-	price := &proto.Price{
-		SrcToken:          request.SrcToken,
-		SrcAmount:         sendAmount.String(),
-		SrcReleaseAmount:  releaseAmount.String(),
-		DstToken:          request.DstToken,
-		DstAmount:         receiveAmount.String(),
-		FeeAmount:         fee.String(),
-		ValidThru:         time.Now().Unix() + s.Config.PriceValidPeriod,
-		MmAddr:            mmAddr.String(),
-		Sig:               "",
-		SrcDepositPeriod:  int64(float64(freezeTime) / BestPeriodMultiplier),
-		DstTransferPeriod: int64(BestPeriodMultiplier * float64(s.Config.DstTransferPeriod)),
-	}
-	sigBytes, err := s.RequestSigner.Sign(price.EncodeSignData())
-	if err != nil {
-		return &proto.PriceResponse{Err: err.(*proto.Err).ToCommonErr()}, nil
-	}
-	price.Sig = eth.Bytes2Hex(sigBytes)
-	return &proto.PriceResponse{Price: price}, nil
-}
-
-func (s *Server) Quote(ctx context.Context, request *proto.QuoteRequest) (response *proto.QuoteResponse, err error) {
-	defer func() {
-		if response.Err == nil {
-			log.Infof("Quote with success, quote %s", request.Quote.String())
-		} else {
-			log.Errorf("Quote with failure, err:%s, quote %s", response.Err.String(), request.Quote.String())
-		}
-	}()
-	if ok, reason := validateQuoteRequest(request); !ok {
-		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_INVALID_ARGUMENTS, reason).ToCommonErr()}, nil
-	}
-	price := request.Price
-	quote := request.Quote
-	srcAmt := price.GetSrcAmt()
-	if !s.RequestSigner.Verify(price.EncodeSignData(), eth.Hex2Bytes(price.Sig)) {
-		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_INVALID_ARGUMENTS, "invalid sig").ToCommonErr()}, nil
-	}
-	if !quote.ValidateQuoteHash() {
-		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_INVALID_ARGUMENTS, "invalid quote hash").ToCommonErr()}, nil
-	}
-	rfqFee, err := s.ChainCaller.GetRfqFee(price.GetSrcChainId(), price.GetDstChainId(), srcAmt)
-	if err != nil {
-		return &proto.QuoteResponse{Err: err.(*proto.Err).ToCommonErr()}, nil
-	}
-	if new(big.Int).Sub(srcAmt, rfqFee).Cmp(price.GetSrcReleaseAmt()) == -1 {
-		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_INVALID_ARGUMENTS, "incorrect src release amount").ToCommonErr()}, nil
-	}
-	dstAmt := price.GetDstAmt()
-	dstTokenAddr := request.Price.DstToken.GetAddr()
-	freezeTime, err := s.LiquidityProvider.AskForFreezing(price.GetDstChainId(), dstTokenAddr, dstAmt, request.DstNative)
-	if err != nil {
-		return &proto.QuoteResponse{Err: err.(*proto.Err).ToCommonErr()}, nil
-	}
-	if time.Now().Unix()+freezeTime < quote.SrcDeadline {
-		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_INVALID_ARGUMENTS, "srcDeadline too large").ToCommonErr()}, nil
-	}
-	if time.Now().Unix()+s.Config.DstTransferPeriod > quote.DstDeadline {
-		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_INVALID_ARGUMENTS, "dstDeadline too small").ToCommonErr()}, nil
-	}
-	sigBytes, err := s.RequestSigner.Sign(quote.GetQuoteHash().Bytes())
-	if err != nil {
-		return &proto.QuoteResponse{Err: err.(*proto.Err).ToCommonErr()}, nil
-	}
-	// no freeze before user deposit token
-	// err = s.LiquidityProvider.FreezeLiquidity(price.GetDstChainId(), dstTokenAddr, dstAmt, quote.SrcDeadline, quote.GetQuoteHash(), request.DstNative)
-	// if err != nil {
-	//	return &proto.QuoteResponse{Err: err.(*proto.Err).ToCommonErr()}, nil
-	// }
-	return &proto.QuoteResponse{QuoteSig: eth.Bytes2Hex(sigBytes)}, nil
 }
 
 func validatePriceRequest(request *proto.PriceRequest) (bool, string) {

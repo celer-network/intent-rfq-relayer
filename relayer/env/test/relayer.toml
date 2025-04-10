@@ -1,5 +1,5 @@
 [priceprovider]
-url = "https://cbridge-stat.s3.us-west-2.amazonaws.com/prod2/cbridge-price.json"
+url = "https://cbridge-stat.s3.us-west-2.amazonaws.com/test/cbridge-price.json"
 
 [rfqserver]
 url = ""
@@ -15,3 +15,4 @@ dstTransferPeriod = 600
 # if faled to report token configs to rfq server, mm will be stucked and retry every <reportRetryPeriod> seconds until success.
 reportRetryPeriod = 180
 processPeriod = 5
+dbUrl = "127.0.0.1:26257"

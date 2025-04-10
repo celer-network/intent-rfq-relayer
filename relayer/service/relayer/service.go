@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/celer-network/peti-rfq-relayer/relayer/db"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -29,6 +30,9 @@ const (
 	RfqServerUrl     = "rfqserver.url"
 	RelayerConfig    = "relayer"
 	MMConfig         = "mm"
+	DbDriver         = "postgres"
+	DbFmt            = "postgresql://root@%s/rfq_relayer?sslmode=disable"
+	DbPoolSize       = 20
 
 	DefaultReportRetryPeriod int64 = 5
 	DefaultProcessPeriod     int64 = 5
@@ -44,6 +48,7 @@ type RfqRelayerServer struct {
 	ChainCaller        rfqmm.ChainQuerier
 	AmountCalculator   rfqmm.AmountCalculator
 	DefaultLiqProvider *rfqmm.DefaultLiquidityProvider
+	Db                 *db.DAL
 }
 
 type ClientPair struct {
@@ -63,7 +68,8 @@ type RfqRelayerConfig struct {
 	// minimum dst transfer period, in order to give mm enough time for dst transfer
 	DstTransferPeriod int64
 	// port num that mm would listen on
-	Port int64
+	Port  int64
+	DbUrl string
 }
 
 func (config *RfqRelayerConfig) clean() {
@@ -142,8 +148,16 @@ func NewRfqRelayerServer() *RfqRelayerServer {
 		log.Fatalf("failed to load mm server configs:%v", err)
 		return nil
 	}
-
 	serverConfig.clean()
+
+	log.Infoln("Initializing DB...")
+	dbConn, err := db.NewDAL(DbDriver, fmt.Sprintf(DbFmt, serverConfig.DbUrl), DbPoolSize, 1)
+	if err != nil {
+		log.Fatalf("failed to new db, dbUrl: %s, err: %v", serverConfig.DbUrl, err)
+		return nil
+	}
+	log.Infoln("Successfully initialize DB")
+
 	return &RfqRelayerServer{
 		Ctl:                make(chan bool),
 		ClientPairMap:      clientPairMap,
@@ -151,6 +165,7 @@ func NewRfqRelayerServer() *RfqRelayerServer {
 		ChainCaller:        cm,
 		DefaultLiqProvider: lp,
 		AmountCalculator:   ac,
+		Db:                 dbConn,
 	}
 }
 
@@ -346,7 +361,7 @@ func (s *RfqRelayerServer) processOrder(pendingOrder *rfqproto.PendingOrder, cli
 		s.updateOrder(clientPair, quoteHash, rfqproto.OrderStatus_STATUS_MM_DST_EXECUTED, eth.Bytes2Hex(txHash.Bytes()))
 	case rfqproto.OrderStatus_STATUS_DST_TRANSFERRED:
 		// 1. send src release
-		txHash, err := s.DefaultLiqProvider.SrcRelease(quote.ToQuoteOnChain(), pendingOrder.ExecMsgCallData)
+		txHash, err := s.DefaultLiqProvider.SrcRelease(pendingOrder.DstNative, quote.ToQuoteOnChain(), pendingOrder.ExecMsgCallData)
 		if err != nil {
 			log.Errorf("SrcRelease err:%s, quoteHash %x", err, quoteHash)
 			return
