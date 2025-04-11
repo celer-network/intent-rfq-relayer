@@ -1,11 +1,11 @@
 [[multichain]]
 chainID = 5
 name = "Goerli"
-gateway = ""
+gateway = "https://goerli.infura.io/v3/e4ab544fc4af43b6bfd75eb56be14b50"
 blkinterval = 15
 blkdelay = 5
 maxblkdelta = 5000
-rfq = "0x60CD75Ce8cB1e9C22efB56eB26E3DCf56ee8e354"
+rfq = "0x1C2B0a861D1a5Ec0A0c86a8C09b8D24D19763753"
 [multichain.native]
 symbol = "ETH"
 address = "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
@@ -14,14 +14,14 @@ decimals = 18
 [[multichain]]
 chainID = 97
 name = "BSC Testnet"
-gateway = "https://bsctestapi.terminet.io/rpc"
+gateway = "https://data-seed-prebsc-1-s3.binance.org:8545"
 blkinterval = 3
 blkdelay = 8
 maxblkdelta = 5000
+gaslimit = 200000
 addgasgwei = 2
 addgasestimateratio = 0.3
-rfq = "0xB09d71298d807575B882e333548F30D887b57b54"
+rfq = "0xB88E8046A9e771ABb1a0C65861A95d2094882479"
 [multichain.native]
 symbol = "BNB"
-address = ""
 decimals = 18
