@@ -12,4 +12,3 @@ CREATE TABLE IF NOT EXISTS relayer (
     create_time TIMESTAMPTZ NOT NULL DEFAULT now(),
     INDEX(create_time)
 );
-

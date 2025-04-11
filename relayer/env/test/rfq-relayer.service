@@ -4,8 +4,8 @@ After=network-online.target
 
 [Service]
 WorkingDirectory=/home/ubuntu/peti-rfq-relayer/
-ExecStart=/home/ubuntu/go/bin/peti-rfq-relayer --home /home/ubuntu/.rfq-relayer -logdir /var/log/peti-rfq-relayer/log -loglevel debug
-StandardError=append:/var/log/peti-rfq-relayer/error/server.err.log
+ExecStart=/home/ubuntu/go/bin/rfq-relayer --home /home/ubuntu/.rfq-relayer -logdir /var/log/rfq-relayer/log -loglevel debug
+StandardError=append:/var/log/rfq-relayer/error/server.err.log
 Restart=always
 RestartSec=10
 User=ubuntu
