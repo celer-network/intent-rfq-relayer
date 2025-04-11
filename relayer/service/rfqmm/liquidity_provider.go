@@ -54,8 +54,16 @@ func NewDefaultLiquidityProvider(cm *ChainManager, config *LPConfig) *DefaultLiq
 	return lp
 }
 
-func (d DefaultLiquidityProvider) IsPaused() bool {
+func (d *DefaultLiquidityProvider) IsPaused() bool {
 	return d.paused
+}
+
+func (d *DefaultLiquidityProvider) GetContractAddress(chainId uint64) (string, bool) {
+	chain, err := d.chainManager.GetChain(chainId)
+	if nil != err {
+		return "", false
+	}
+	return chain.RfqAddress.String(), true
 }
 
 func (d *DefaultLiquidityProvider) DstTransfer(transferNative bool, _quote rfq.RFQQuote, sig []byte, opts ...ethutils.TxOption) (eth.Hash, error) {

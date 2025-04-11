@@ -340,7 +340,16 @@ func (s *RfqRelayerServer) processOrder(pendingOrder *rfqproto.PendingOrder, cli
 		}
 
 		// 4. get sig from mm
-		response, err := clientPair.RfqMmClient.SignQuoteHash(context.Background(), &rfqmmproto.SignQuoteHashRequest{Data: quote.GetQuoteHash().Bytes()})
+		contractAddress, found := s.DefaultLiqProvider.GetContractAddress(quote.GetDstChainId())
+		if !found {
+			log.Errorf("GetContractAddress, quoteHash: %s, dstChainId %d", quoteHash.String(), quote.GetDstChainId())
+			return
+		}
+		response, err := clientPair.RfqMmClient.SignQuoteHash(context.Background(), &rfqmmproto.SignQuoteHashRequest{
+			Data:         quote.GetQuoteHash().Bytes(),
+			DstChainId:   quote.GetDstChainId(),
+			ContractAddr: contractAddress,
+		})
 		if nil != err {
 			log.Errorf("Get Sign, fail to request rfq mm, mmId: %s, apiKey: %s, err: %v", clientPair.MmId, clientPair.ApiKey, err)
 			return
