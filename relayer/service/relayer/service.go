@@ -29,7 +29,7 @@ const (
 	PriceProviderUrl = "priceprovider.url"
 	RfqServerUrl     = "rfqserver.url"
 	RelayerConfig    = "relayer"
-	MMConfig         = "mm"
+	MMConfig         = "rfqmm"
 	DbDriver         = "postgres"
 	DbFmt            = "postgresql://root@%s/rfq_relayer?sslmode=disable"
 	DbPoolSize       = 20
