@@ -1,7 +1,7 @@
 install:
 	@echo "--> Ensure dependencies have not been modified"
 	GO111MODULE=on go mod verify
-	go build -o $(HOME)/go/bin/peti-rfq-relayer ./relayer/main/main.go
+	go build -o $(HOME)/go/bin/rfq-relayer ./relayer/main/main.go
 
 .PHONY: proto
 proto:
