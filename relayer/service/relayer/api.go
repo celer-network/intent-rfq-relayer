@@ -76,6 +76,10 @@ func (s *RfqRelayerServer) Quote(ctx context.Context, request *proto.QuoteReques
 	return response, nil
 }
 
+func (s *RfqRelayerServer) SignQuoteHash(ctx context.Context, request *proto.SignQuoteHashRequest) (*proto.SignQuoteHashResponse, error) {
+	return &proto.SignQuoteHashResponse{}, nil
+}
+
 func (s *RfqRelayerServer) Sign(ctx context.Context, request *proto.SignRequest) (response *proto.SignResponse, err error) {
 	return &proto.SignResponse{}, nil
 }
