@@ -51,6 +51,8 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 	resSrcReleaseAmount := new(big.Int)
 	resSrcReleaseAmount.SetString(response.Price.SrcReleaseAmount, 10)
 	if srcReleaseAmount.Cmp(resSrcReleaseAmount) != 0 {
+		log.Warnf("srcAmount: %s, srcReleaseAmount: %s, baseFee: %s, rfqFee: %s, resSrcReleaseAmount: %s",
+			srcAmount.String(), srcReleaseAmount.String(), baseFee.String(), rfqFee.String(), resSrcReleaseAmount.String())
 		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "invalid src release amount").ToCommonErr()}, nil
 	}
 
