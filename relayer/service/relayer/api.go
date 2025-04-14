@@ -10,7 +10,7 @@ import (
 	"github.com/celer-network/peti-rfq-relayer/relayer/service/rfqmm/proto"
 )
 
-const apiKey string = "apiKey"
+const apiKey string = "apikey"
 
 func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceRequest) (response *proto.PriceResponse, err error) {
 	apiKey := ctx.Value(apiKey).(string)
