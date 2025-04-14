@@ -2,6 +2,7 @@ package relayer
 
 import (
 	"context"
+	"google.golang.org/grpc/metadata"
 	"math/big"
 	"time"
 
@@ -10,10 +11,12 @@ import (
 	"github.com/celer-network/peti-rfq-relayer/relayer/service/rfqmm/proto"
 )
 
-const apiKey string = "apikey"
-
 func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceRequest) (response *proto.PriceResponse, err error) {
-	apiKey := ctx.Value(apiKey).(string)
+	apiKey, found := getApiKey(ctx)
+	if !found {
+		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "unknown apiKey").ToCommonErr()}, nil
+	}
+
 	clientPair := s.ClientPairMap[apiKey]
 	if nil == clientPair {
 		log.Warnf("Price, unknown apiKey: %s", apiKey)
@@ -42,7 +45,11 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 }
 
 func (s *RfqRelayerServer) Quote(ctx context.Context, request *proto.QuoteRequest) (response *proto.QuoteResponse, err error) {
-	apiKey := ctx.Value(apiKey).(string)
+	apiKey, found := getApiKey(ctx)
+	if !found {
+		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "unknown apiKey").ToCommonErr()}, nil
+	}
+
 	clientPair := s.ClientPairMap[apiKey]
 	if nil == clientPair {
 		log.Warnf("Price, unknown apiKey: %s", apiKey)
@@ -92,4 +99,19 @@ func (s *RfqRelayerServer) Verify(ctx context.Context, request *proto.VerifyRequ
 
 func (s *RfqRelayerServer) Tokens(ctx context.Context, request *proto.TokensRequest) (response *proto.TokensResponse, err error) {
 	return &proto.TokensResponse{}, nil
+}
+
+func getApiKey(ctx context.Context) (string, bool) {
+	mk, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return "", false
+	}
+	var apiKey string
+	if val, ok := mk["apikey"]; ok {
+		apiKey = val[0]
+	} else {
+		return "", false
+	}
+
+	return apiKey, true
 }
