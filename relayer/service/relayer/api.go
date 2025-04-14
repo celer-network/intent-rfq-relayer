@@ -38,6 +38,7 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 	if nil != err || nil != response.Err {
 		return response, err
 	}
+	log.Infof("Price, response: %v", response)
 
 	// validate response src release amount
 	srcAmount := new(big.Int)
@@ -64,7 +65,7 @@ func (s *RfqRelayerServer) Quote(ctx context.Context, request *proto.QuoteReques
 
 	clientPair := s.ClientPairMap[apiKey]
 	if nil == clientPair {
-		log.Warnf("Price, unknown apiKey: %s", apiKey)
+		log.Warnf("Quote, unknown apiKey: %s", apiKey)
 		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "unknown apiKey").ToCommonErr()}, nil
 	}
 	log.Infof("Quote, apiKey: %s, request: %v", apiKey, request)
@@ -81,7 +82,7 @@ func (s *RfqRelayerServer) Quote(ctx context.Context, request *proto.QuoteReques
 	decimal := big.NewFloat(math.Pow(10, float64(request.Quote.SrcToken.Decimals)))
 	tokenInPrice, err := s.AmountCalculator.PriceProvider.GetPrice(request.Quote.SrcToken)
 	if nil != err {
-		log.Errorf("Price, fail to GetPrice, srcToken: %v, err: %v", request.Quote.SrcToken, err)
+		log.Errorf("Quote, fail to GetPrice, srcToken: %v, err: %v", request.Quote.SrcToken, err)
 		return response, nil
 	}
 
@@ -112,6 +113,8 @@ func (s *RfqRelayerServer) Quote(ctx context.Context, request *proto.QuoteReques
 	if nil != err {
 		log.Errorf("Quote, fail to UpsertIntoRelayer, err: %v", err)
 	}
+
+	log.Infof("Quote, response: %v", response)
 
 	return response, nil
 }
