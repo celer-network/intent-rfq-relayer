@@ -117,7 +117,7 @@ func (d *DefaultLiquidityProvider) SrcRelease(transferNative bool, _quote rfq.RF
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, fmt.Sprintf("no transactor for chain %d", _quote.SrcChainId))
 	}
 	// determine release native or not
-	releaseNative := transferNative
+	releaseNative := false
 	// if chain.NativeWrap.GetAddr() == _quote.SrcToken {
 	// 	releaseNative, err = d.liqManager.ReleaseNative(_quote.SrcChainId)
 	// 	if err != nil {
@@ -152,7 +152,7 @@ func (d *DefaultLiquidityProvider) sameChainTransfer(transferNative bool, _quote
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, fmt.Sprintf("no transactor for chain %d", _quote.DstChainId))
 	}
 	// determine release native or not
-	releaseNative := transferNative
+	releaseNative := false
 	// if chain.NativeWrap.GetAddr() == _quote.SrcToken {
 	// 	releaseNative, err = d.liqManager.ReleaseNative(_quote.SrcChainId)
 	// 	if err != nil {
