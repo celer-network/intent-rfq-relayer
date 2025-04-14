@@ -2,9 +2,9 @@ package rfq
 
 import (
 	"context"
+	"google.golang.org/grpc"
 
 	"github.com/celer-network/peti-rfq-relayer/relayer/service/rfq/proto"
-	"google.golang.org/grpc"
 )
 
 type Client struct {

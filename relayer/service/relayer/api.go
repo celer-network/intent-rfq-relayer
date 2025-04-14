@@ -19,6 +19,7 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 		log.Warnf("Price, unknown apiKey: %s", apiKey)
 		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "unknown apiKey").ToCommonErr()}, nil
 	}
+	log.Infof("Price, apiKey: %s, request: %v", apiKey, request)
 
 	response, err = clientPair.RfqMmClient.Price(ctx, request)
 	if nil != err || response.Err != nil {
@@ -47,6 +48,7 @@ func (s *RfqRelayerServer) Quote(ctx context.Context, request *proto.QuoteReques
 		log.Warnf("Price, unknown apiKey: %s", apiKey)
 		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "unknown apiKey").ToCommonErr()}, nil
 	}
+	log.Infof("Quote, apiKey: %s, request: %v", apiKey, request)
 
 	response, err = clientPair.RfqMmClient.Quote(ctx, request)
 	if nil != err || response.Err != nil {

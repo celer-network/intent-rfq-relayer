@@ -71,8 +71,6 @@ func (d *DefaultLiquidityProvider) DstTransfer(transferNative bool, _quote rfq.R
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, "liquidity provider is paused due to some serious error")
 	}
 
-	log.Infof("DstTransfer, sig: %x, %v", sig, sig)
-
 	// check if it's a same chain swap
 	if _quote.DstChainId == _quote.SrcChainId {
 		return d.sameChainTransfer(transferNative, _quote, sig, opts...)
