@@ -46,7 +46,7 @@ type RfqRelayerServer struct {
 	ClientPairMap      map[string]*ClientPair
 	Config             *RfqRelayerConfig
 	ChainCaller        rfqmm.ChainQuerier
-	AmountCalculator   rfqmm.AmountCalculator
+	AmountCalculator   *rfqmm.DefaultAmtCalculator
 	DefaultLiqProvider *rfqmm.DefaultLiquidityProvider
 	Db                 *db.DAL
 }

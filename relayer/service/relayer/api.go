@@ -3,6 +3,7 @@ package relayer
 import (
 	"context"
 	"google.golang.org/grpc/metadata"
+	"math"
 	"math/big"
 	"time"
 
@@ -24,11 +25,6 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 	}
 	log.Infof("Price, apiKey: %s, request: %v", apiKey, request)
 
-	response, err = clientPair.RfqMmClient.Price(ctx, request)
-	if nil != err || response.Err != nil {
-		return response, err
-	}
-
 	// calculate base fee and sub from src release amount
 	baseFee, _, err := s.AmountCalculator.CalFixedCost(request.SrcToken, request.DstToken)
 	if nil != err {
@@ -36,10 +32,26 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 			request.SrcToken, request.DstToken, err)
 		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, err.Error()).ToCommonErr()}, nil
 	}
-	srcReleaseAmount := new(big.Int)
-	srcReleaseAmount.SetString(response.Price.SrcReleaseAmount, 10)
-	srcReleaseAmount = new(big.Int).Sub(srcReleaseAmount, baseFee)
-	response.Price.SrcReleaseAmount = srcReleaseAmount.String()
+	request.BaseAmount = baseFee.String()
+
+	response, err = clientPair.RfqMmClient.Price(ctx, request)
+	if nil != err || nil != response.Err {
+		return response, err
+	}
+
+	// validate response src release amount
+	srcAmount := new(big.Int)
+	srcAmount.SetString(response.Price.SrcAmount, 10)
+	rfqFee, err := s.ChainCaller.GetRfqFee(request.SrcToken.ChainId, request.DstToken.ChainId, srcAmount)
+	if nil != err {
+		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "invalid rfq fee").ToCommonErr()}, nil
+	}
+	srcReleaseAmount := new(big.Int).Sub(new(big.Int).Sub(srcAmount, baseFee), rfqFee)
+	resSrcReleaseAmount := new(big.Int)
+	resSrcReleaseAmount.SetString(response.Price.SrcReleaseAmount, 10)
+	if srcReleaseAmount.Cmp(resSrcReleaseAmount) != 0 {
+		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "invalid src release amount").ToCommonErr()}, nil
+	}
 
 	return response, nil
 }
@@ -62,19 +74,38 @@ func (s *RfqRelayerServer) Quote(ctx context.Context, request *proto.QuoteReques
 		return response, err
 	}
 
-	// calculate base fee and record to db
-	baseFee, baseFeeUsd, err := s.AmountCalculator.CalFixedCost(request.Quote.SrcToken, request.Quote.DstToken)
+	srcAmount := new(big.Int)
+	srcAmount.SetString(request.Quote.SrcAmount, 10)
+	srcReleaseAmount := new(big.Int)
+	srcReleaseAmount.SetString(request.Quote.SrcReleaseAmount, 10)
+	decimal := big.NewFloat(math.Pow(10, float64(request.Quote.SrcToken.Decimals)))
+	tokenInPrice, err := s.AmountCalculator.PriceProvider.GetPrice(request.Quote.SrcToken)
 	if nil != err {
-		log.Errorf("Price, fail to CalFixedCost, srcToken: %v, dstToken: %v, err: %v",
-			request.Quote.SrcToken, request.Quote.DstToken, err)
+		log.Errorf("Price, fail to GetPrice, srcToken: %v, err: %v", request.Quote.SrcToken, err)
 		return response, nil
 	}
+
+	// calculate rfq fee and record to db
+	rfqFee, err := s.ChainCaller.GetRfqFee(request.Quote.SrcToken.ChainId, request.Quote.DstToken.ChainId, srcAmount)
+	if nil != err {
+		return &proto.QuoteResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "invalid rfq fee").ToCommonErr()}, nil
+	}
+	rfqFeeUsd, _ := new(big.Float).Quo(new(big.Float).SetInt(rfqFee), decimal).Float64()
+	rfqFeeUsd *= tokenInPrice
+
+	// calculate base fee and record to db
+	baseFee := new(big.Int).Sub(new(big.Int).Sub(srcAmount, srcReleaseAmount), rfqFee)
+	baseFeeUsd, _ := new(big.Float).Quo(new(big.Float).SetInt(baseFee), decimal).Float64()
+	baseFeeUsd *= tokenInPrice
+
 	err = s.Db.UpsertIntoRelayer(&db.Relayer{
 		QuoteHash:      request.Quote.Hash,
 		SrcChainId:     request.Quote.SrcToken.ChainId,
 		SrcTokenSymbol: request.Quote.SrcToken.Symbol,
 		DstChainId:     request.Quote.DstToken.ChainId,
 		DstTokenSymbol: request.Quote.DstToken.Symbol,
+		RfqFee:         rfqFee,
+		RfqFeeUsd:      rfqFeeUsd,
 		BaseFee:        baseFee,
 		BaseFeeUsd:     baseFeeUsd,
 		CreateTime:     time.Now()})
