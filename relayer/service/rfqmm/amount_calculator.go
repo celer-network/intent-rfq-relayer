@@ -120,6 +120,8 @@ func (ac *DefaultAmtCalculator) CalFixedCost(tokenIn, tokenOut *common.Token) (f
 	dstGasCost := big.NewInt(int64(ac.DstGasCost))
 	// represent dst gas cost by src token amount
 	dstGasCostInIn := convertAmount(new(big.Int).Mul(dstGasCost, dstGasPrice), nativeOutPrice, tokenInPrice, tokenIn.Decimals-nativeOut.Decimals)
+	log.Infof("dstGasCost: %s, dstGasPrice: %s, nativeOutPrice: %f, tokenInPrice: %f, decimalDiff: %d, dstGasCostInIn: %s",
+		dstGasCost.String(), dstGasPrice.String(), nativeOutPrice, tokenInPrice, tokenIn.Decimals-nativeOut.Decimals, dstGasCostInIn.String())
 
 	// 3 dst msg fee
 	msgFeeAmt, _ := ac.Querier.GetMsgFee(chainOut)
