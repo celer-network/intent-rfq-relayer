@@ -277,6 +277,10 @@ func (s *RfqRelayerServer) processOrders(clientPair *ClientPair) {
 		log.Errorf("PendingOrders err:%s", err)
 		return
 	}
+	log.Infof("processOrders, orders number: %d", len(resp.Orders))
+	if len(resp.Orders) == 0 {
+		return
+	}
 
 	var wg sync.WaitGroup
 	for _, pendingOrder := range resp.Orders {
