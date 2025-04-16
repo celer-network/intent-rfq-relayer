@@ -66,14 +66,14 @@ func (d *DefaultLiquidityProvider) GetContractAddress(chainId uint64) (string, b
 	return chain.RfqAddress.String(), true
 }
 
-func (d *DefaultLiquidityProvider) DstTransfer(transferNative bool, _quote rfq.RFQQuote, sig []byte, opts ...ethutils.TxOption) (eth.Hash, error) {
+func (d *DefaultLiquidityProvider) DstTransfer(_quote rfq.RFQQuote, sig []byte, opts ...ethutils.TxOption) (eth.Hash, error) {
 	if d.paused {
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, "liquidity provider is paused due to some serious error")
 	}
 
 	// check if it's a same chain swap
 	if _quote.DstChainId == _quote.SrcChainId {
-		return d.sameChainTransfer(transferNative, _quote, sig, opts...)
+		return d.sameChainTransfer(_quote, sig, opts...)
 	}
 	chain, err := d.chainManager.GetChain(_quote.DstChainId)
 	if err != nil {
@@ -84,17 +84,10 @@ func (d *DefaultLiquidityProvider) DstTransfer(transferNative bool, _quote rfq.R
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, fmt.Sprintf("no transactor for chain %d", _quote.DstChainId))
 	}
 	var method ethutils.TxMethod
-	if transferNative {
-		method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
-			return chain.RfqContract.DstTransferNative(opts, _quote)
-		}
-		opts = append(opts, ethutils.WithEthValue(new(big.Int).Add(_quote.DstAmount, chain.MsgFee)))
-	} else {
-		method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
-			return chain.RfqContract.DstTransferWithSig(opts, _quote, sig)
-		}
-		opts = append(opts, ethutils.WithEthValue(chain.MsgFee))
+	method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
+		return chain.RfqContract.DstTransferWithSig(opts, _quote, sig)
 	}
+	opts = append(opts, ethutils.WithEthValue(chain.MsgFee))
 	tx, err := txr.Transact(d.genTxHandler(dstTransfer, _quote), method, opts...)
 	if err != nil {
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, fmt.Sprintf("Transact err:%s", err))
@@ -102,7 +95,7 @@ func (d *DefaultLiquidityProvider) DstTransfer(transferNative bool, _quote rfq.R
 	return tx.Hash(), nil
 }
 
-func (d *DefaultLiquidityProvider) SrcRelease(transferNative bool, _quote rfq.RFQQuote, _execMsgCallData []byte, opts ...ethutils.TxOption) (eth.Hash, error) {
+func (d *DefaultLiquidityProvider) SrcRelease(_quote rfq.RFQQuote, _execMsgCallData []byte, opts ...ethutils.TxOption) (eth.Hash, error) {
 	if d.paused {
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, "liquidity provider is paused due to some serious error")
 	}
@@ -114,23 +107,10 @@ func (d *DefaultLiquidityProvider) SrcRelease(transferNative bool, _quote rfq.RF
 	if !ok {
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, fmt.Sprintf("no transactor for chain %d", _quote.SrcChainId))
 	}
-	// determine release native or not
-	releaseNative := false
-	// if chain.NativeWrap.GetAddr() == _quote.SrcToken {
-	// 	releaseNative, err = d.liqManager.ReleaseNative(_quote.SrcChainId)
-	// 	if err != nil {
-	// 		return eth.ZeroHash, err
-	// 	}
-	// }
+	// do not support release native
 	var method ethutils.TxMethod
-	if releaseNative {
-		method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
-			return chain.RfqContract.SrcReleaseNative(opts, _quote, _execMsgCallData)
-		}
-	} else {
-		method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
-			return chain.RfqContract.SrcRelease(opts, _quote, _execMsgCallData)
-		}
+	method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
+		return chain.RfqContract.SrcRelease(opts, _quote, _execMsgCallData)
 	}
 	tx, err := txr.Transact(d.genTxHandler(srcRelease, _quote), method, opts...)
 	if err != nil {
@@ -139,7 +119,7 @@ func (d *DefaultLiquidityProvider) SrcRelease(transferNative bool, _quote rfq.RF
 	return tx.Hash(), nil
 }
 
-func (d *DefaultLiquidityProvider) sameChainTransfer(transferNative bool, _quote rfq.RFQQuote, sig []byte, opts ...ethutils.TxOption) (eth.Hash, error) {
+func (d *DefaultLiquidityProvider) sameChainTransfer(_quote rfq.RFQQuote, sig []byte, opts ...ethutils.TxOption) (eth.Hash, error) {
 	chain, err := d.chainManager.GetChain(_quote.DstChainId)
 	if err != nil {
 		return eth.ZeroHash, err
@@ -149,24 +129,11 @@ func (d *DefaultLiquidityProvider) sameChainTransfer(transferNative bool, _quote
 	if !ok {
 		return eth.ZeroHash, proto.NewErr(proto.ErrCode_ERROR_LIQUIDITY_PROVIDER, fmt.Sprintf("no transactor for chain %d", _quote.DstChainId))
 	}
-	// determine release native or not
+	// do not support release native
 	releaseNative := false
-	// if chain.NativeWrap.GetAddr() == _quote.SrcToken {
-	// 	releaseNative, err = d.liqManager.ReleaseNative(_quote.SrcChainId)
-	// 	if err != nil {
-	// 		return eth.ZeroHash, err
-	// 	}
-	// }
 	var method ethutils.TxMethod
-	if transferNative {
-		method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
-			return chain.RfqContract.SameChainTransferNative(opts, _quote, releaseNative)
-		}
-		opts = append(opts, ethutils.WithEthValue(_quote.DstAmount))
-	} else {
-		method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
-			return chain.RfqContract.SameChainTransferWithSig(opts, _quote, releaseNative, sig)
-		}
+	method = func(transactor bind.ContractTransactor, opts *bind.TransactOpts) (*ethtypes.Transaction, error) {
+		return chain.RfqContract.SameChainTransferWithSig(opts, _quote, releaseNative, sig)
 	}
 	tx, err := txr.Transact(
 		d.genTxHandler(sameChainTransfer, _quote), method, opts...)

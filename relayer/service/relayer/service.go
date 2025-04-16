@@ -355,7 +355,7 @@ func (s *RfqRelayerServer) processOrder(pendingOrder *rfqproto.PendingOrder, cli
 		}
 
 		// 5. send dst transfer
-		txHash, err := s.DefaultLiqProvider.DstTransfer(pendingOrder.DstNative, quote.ToQuoteOnChain(), response.Sig)
+		txHash, err := s.DefaultLiqProvider.DstTransfer(quote.ToQuoteOnChain(), response.Sig)
 		if err != nil {
 			log.Errorf("DstTransfer err:%s, quoteHash %x", err, quoteHash)
 			return
@@ -365,7 +365,7 @@ func (s *RfqRelayerServer) processOrder(pendingOrder *rfqproto.PendingOrder, cli
 		s.updateOrder(clientPair, quoteHash, rfqproto.OrderStatus_STATUS_MM_DST_EXECUTED, eth.Bytes2Hex(txHash.Bytes()))
 	case rfqproto.OrderStatus_STATUS_DST_TRANSFERRED:
 		// 1. send src release
-		txHash, err := s.DefaultLiqProvider.SrcRelease(pendingOrder.DstNative, quote.ToQuoteOnChain(), pendingOrder.ExecMsgCallData)
+		txHash, err := s.DefaultLiqProvider.SrcRelease(quote.ToQuoteOnChain(), pendingOrder.ExecMsgCallData)
 		if err != nil {
 			log.Errorf("SrcRelease err:%s, quoteHash %x", err, quoteHash)
 			return
@@ -374,23 +374,6 @@ func (s *RfqRelayerServer) processOrder(pendingOrder *rfqproto.PendingOrder, cli
 		// 2. update order's status
 		s.updateOrder(clientPair, quoteHash, rfqproto.OrderStatus_STATUS_MM_SRC_EXECUTED, eth.Bytes2Hex(txHash.Bytes()))
 	}
-}
-
-func (s *ClientPair) ValidateQuote(quote *rfqmmproto.Quote, sig []byte) bool {
-	// 1 check sig
-	response, err := s.RfqMmClient.Verify(context.Background(), &rfqmmproto.VerifyRequest{Data: quote.GetQuoteHash().Bytes(), Sig: sig})
-	if nil != err || !response.GetVerified() {
-		// serious error
-		log.Errorf("[Serious] Invalid sig, quoteHash %x, err: %v", eth.Hex2Hash(quote.Hash), err)
-		return false
-	}
-	// 2 check quote hash
-	if quote.GetQuoteHash() != quote.EncodeQuoteHash() {
-		// serious error
-		log.Errorf("[Serious] Quote hash mismatch, got %x, calculated %x", eth.Hex2Hash(quote.Hash), quote.EncodeQuoteHash())
-		return false
-	}
-	return true
 }
 
 func (s *RfqRelayerServer) updateOrder(clientPair *ClientPair, quoteHash eth.Hash, toStatus rfqproto.OrderStatus, txHash string) {
