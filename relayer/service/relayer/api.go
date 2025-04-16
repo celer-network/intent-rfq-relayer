@@ -126,14 +126,6 @@ func (s *RfqRelayerServer) SignQuoteHash(ctx context.Context, request *proto.Sig
 	return &proto.SignQuoteHashResponse{}, nil
 }
 
-func (s *RfqRelayerServer) Sign(ctx context.Context, request *proto.SignRequest) (response *proto.SignResponse, err error) {
-	return &proto.SignResponse{}, nil
-}
-
-func (s *RfqRelayerServer) Verify(ctx context.Context, request *proto.VerifyRequest) (response *proto.VerifyResponse, err error) {
-	return &proto.VerifyResponse{}, nil
-}
-
 func (s *RfqRelayerServer) Tokens(ctx context.Context, request *proto.TokensRequest) (response *proto.TokensResponse, err error) {
 	return &proto.TokensResponse{}, nil
 }
