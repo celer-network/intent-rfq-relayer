@@ -14,5 +14,5 @@ priceValidPeriod = 300
 dstTransferPeriod = 600
 # if faled to report token configs to rfq server, mm will be stucked and retry every <reportRetryPeriod> seconds until success.
 reportRetryPeriod = 180
-processPeriod = 5
+processPeriod = 10
 dbUrl = "127.0.0.1:26257"

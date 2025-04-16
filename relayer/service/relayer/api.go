@@ -34,6 +34,7 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 	}
 	request.BaseAmount = baseFee.String()
 
+	// todo: use srcReleaseAmount instead baseAmount to avoid rfq config change at onchain
 	response, err = clientPair.RfqMmClient.Price(ctx, request)
 	if nil != err || nil != response.Err {
 		return response, err
