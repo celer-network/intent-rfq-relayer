@@ -296,10 +296,6 @@ func (s *RfqRelayerServer) processOrders(clientPair *ClientPair) {
 func (s *RfqRelayerServer) processOrder(pendingOrder *rfqproto.PendingOrder, clientPair *ClientPair) {
 	quote := pendingOrder.Quote
 	quoteHash := quote.GetQuoteHash()
-	if !clientPair.ValidateQuote(quote, eth.Hex2Bytes(pendingOrder.QuoteSig)) {
-		log.Errorf("Invalid quote, quoteHash %x", quoteHash)
-		return
-	}
 
 	switch pendingOrder.Status {
 	case rfqproto.OrderStatus_STATUS_SRC_DEPOSITED:
