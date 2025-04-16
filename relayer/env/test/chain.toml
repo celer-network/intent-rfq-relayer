@@ -5,7 +5,7 @@ gateway = "https://goerli.infura.io/v3/e4ab544fc4af43b6bfd75eb56be14b50"
 blkinterval = 15
 blkdelay = 5
 maxblkdelta = 5000
-rfq = "0x1C2B0a861D1a5Ec0A0c86a8C09b8D24D19763753"
+rfq = "0xfF3cf572D591391935EF45F379C6D83182Feff5C"
 [multichain.native]
 symbol = "ETH"
 address = "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
@@ -21,7 +21,7 @@ maxblkdelta = 5000
 gaslimit = 200000
 addgasgwei = 2
 addgasestimateratio = 0.3
-rfq = "0xB88E8046A9e771ABb1a0C65861A95d2094882479"
+rfq = "0xdc23f4F3dFA283eD56F84d40F5AdE69dF16ec32E"
 [multichain.native]
 symbol = "BNB"
 decimals = 18
