@@ -36,7 +36,7 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 
 	// todo: use srcReleaseAmount instead baseAmount to avoid rfq config change at onchain
 	response, err = clientPair.RfqMmClient.Price(ctx, request)
-	if nil != err || nil != response.Err {
+	if nil != err || nil != response.Err || nil == response.Price {
 		return response, err
 	}
 	log.Infof("Price, response: %v", response)
@@ -56,6 +56,12 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 			srcAmount.String(), srcReleaseAmount.String(), baseFee.String(), rfqFee.String(), resSrcReleaseAmount.String())
 		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, "invalid src release amount").ToCommonErr()}, nil
 	}
+
+	// correct feeAmount
+	feeAmount := new(big.Int)
+	feeAmount.SetString(response.Price.FeeAmount, 10)
+	feeAmount = new(big.Int).Sub(feeAmount, baseFee)
+	response.Price.FeeAmount = feeAmount.String()
 
 	return response, nil
 }
