@@ -60,7 +60,7 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 	// correct feeAmount
 	feeAmount := new(big.Int)
 	feeAmount.SetString(response.Price.FeeAmount, 10)
-	feeAmount = new(big.Int).Sub(feeAmount, baseFee)
+	feeAmount = new(big.Int).Add(feeAmount, baseFee)
 	response.Price.FeeAmount = feeAmount.String()
 
 	return response, nil
