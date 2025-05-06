@@ -20,7 +20,7 @@ import (
 type RfqMmConfig struct {
 	MmId         string
 	ApiKey       string
-	Endpoint     string
+	RpcEndpoint  string
 	HttpEndpoint string
 }
 

@@ -189,10 +189,10 @@ func newClients(rfqServerUrl string, mmConfigs []*rfqmm.RfqMmConfig) map[string]
 			ApiKey:          mmConfig.ApiKey,
 			RfqServerClient: rfqServerClient,
 		}
-		if len(mmConfig.Endpoint) != 0 {
+		if len(mmConfig.RpcEndpoint) != 0 {
 			// mm use rpc
 			opts := grpc.WithTransportCredentials(insecure.NewCredentials())
-			clientPair.RfqMmRpcClient = rfqmm.NewClient(mmConfig.Endpoint, opts)
+			clientPair.RfqMmRpcClient = rfqmm.NewClient(mmConfig.RpcEndpoint, opts)
 			clientPair.RfqMmClientMode = RpcMode
 		} else {
 			// mm use http
