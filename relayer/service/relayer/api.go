@@ -35,7 +35,7 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 	request.BaseAmount = baseFee.String()
 
 	// todo: use srcReleaseAmount instead baseAmount to avoid rfq config change at onchain
-	response, err = clientPair.RfqMmClient.Price(ctx, request)
+	response, err = clientPair.Price(ctx, request)
 	if nil != err || nil != response.Err || nil == response.Price {
 		return response, err
 	}
@@ -79,7 +79,7 @@ func (s *RfqRelayerServer) Quote(ctx context.Context, request *proto.QuoteReques
 	}
 	log.Infof("Quote, apiKey: %s, request: %v", apiKey, request)
 
-	response, err = clientPair.RfqMmClient.Quote(ctx, request)
+	response, err = clientPair.Quote(ctx, request)
 	if nil != err || response.Err != nil {
 		return response, err
 	}
@@ -149,4 +149,8 @@ func getApiKey(ctx context.Context) (string, bool) {
 	}
 
 	return apiKey, true
+}
+
+func getPrice(ctx context.Context) {
+
 }

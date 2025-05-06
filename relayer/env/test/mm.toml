@@ -2,3 +2,4 @@
 mmId = "sanbao"
 apikey = "95864d79-cf96-45d7-b134-cd0bd00753ef"
 endpoint = "52.13.236.124:9094"
+httpEndpoint = ""
