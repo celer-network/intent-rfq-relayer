@@ -70,10 +70,6 @@ type RfqRelayerConfig struct {
 	ReportRetryPeriod int64
 	// the period for processing pending orders
 	ProcessPeriod int64
-	// indicates the period for a price to be valid
-	PriceValidPeriod int64
-	// minimum dst transfer period, in order to give mm enough time for dst transfer
-	DstTransferPeriod int64
 	// port num that mm would listen on
 	Port  int64
 	DbUrl string
@@ -88,15 +84,6 @@ func (config *RfqRelayerConfig) clean() {
 		config.ProcessPeriod = DefaultProcessPeriod
 		log.Debugf("Got 0 ProcessPeriod, use default value(%d) instead.", DefaultProcessPeriod)
 	}
-	if config.PriceValidPeriod == 0 {
-		config.PriceValidPeriod = DefaultPriceValidPeriod
-		log.Debugf("Got 0 PriceValidPeriod, use default value(%d) instead.", DefaultPriceValidPeriod)
-	}
-	if config.DstTransferPeriod == 0 {
-		config.DstTransferPeriod = DefaultDstTransferPeriod
-		log.Debugf("Got 0 DstTransferPeriod, use default value(%d) instead.", DefaultDstTransferPeriod)
-	}
-
 	if config.Port == 0 {
 		config.Port = DefaultPortListenOn
 		log.Debugf("Got 0 PortListenOn, use default value(%d) instead.", DefaultPortListenOn)
