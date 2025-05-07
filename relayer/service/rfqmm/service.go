@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/celer-network/goutils/log"
 	"github.com/celer-network/peti-rfq-relayer/relayer/common"
 	"github.com/celer-network/peti-rfq-relayer/relayer/eth"
 	rfqproto "github.com/celer-network/peti-rfq-relayer/relayer/service/rfq/proto"
@@ -79,7 +80,7 @@ func (c *RfqMmHttpClient) Price(request *proto.PriceRequest) (*proto.PriceRespon
 	unmarshaler := jsonpb.Unmarshaler{
 		AllowUnknownFields: true,
 	}
-	resMsg, err := c.requestServer("POST", request)
+	resMsg, err := c.requestServer("POST", "/v1/rfqmm/price", request)
 	if nil != err {
 		return nil, err
 	}
@@ -93,7 +94,7 @@ func (c *RfqMmHttpClient) Quote(request *proto.QuoteRequest) (*proto.QuoteRespon
 	unmarshaler := jsonpb.Unmarshaler{
 		AllowUnknownFields: true,
 	}
-	resMsg, err := c.requestServer("POST", request)
+	resMsg, err := c.requestServer("POST", "/v1/rfqmm/quote", request)
 	if nil != err {
 		return nil, err
 	}
@@ -107,7 +108,7 @@ func (c *RfqMmHttpClient) SignQuoteHash(request *proto.SignQuoteHashRequest) (*p
 	unmarshaler := jsonpb.Unmarshaler{
 		AllowUnknownFields: true,
 	}
-	resMsg, err := c.requestServer("POST", request)
+	resMsg, err := c.requestServer("POST", "/v1/rfqmm/signQuoteHash", request)
 	if nil != err {
 		return nil, err
 	}
@@ -121,7 +122,7 @@ func (c *RfqMmHttpClient) Tokens(request *proto.TokensRequest) (*proto.TokensRes
 	unmarshaler := jsonpb.Unmarshaler{
 		AllowUnknownFields: true,
 	}
-	resMsg, err := c.requestServer("POST", request)
+	resMsg, err := c.requestServer("POST", "/v1/rfqmm/tokens", request)
 	if nil != err {
 		return nil, err
 	}
@@ -131,15 +132,17 @@ func (c *RfqMmHttpClient) Tokens(request *proto.TokensRequest) (*proto.TokensRes
 	return response, err
 }
 
-func (c *RfqMmHttpClient) requestServer(method string, request interface{}) (string, error) {
+func (c *RfqMmHttpClient) requestServer(method string, urlSuffix string, request interface{}) (string, error) {
 	requestMsg, err := json.Marshal(request)
 	if nil != err {
+		log.Errorf("requestServer, fail to Marshal, request: %v, err: %v", requestMsg, err)
 		return "", err
 	}
 
 	body := bytes.NewBuffer(requestMsg)
-	req, err := http.NewRequest(method, c.Url, body)
+	req, err := http.NewRequest(method, c.Url+urlSuffix, body)
 	if err != nil {
+		log.Errorf("requestServer, fail to NewRequest, url: %s, body: %s, err: %v", c.Url+urlSuffix, body.String(), err)
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json;charset=utf-8")
