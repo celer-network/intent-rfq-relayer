@@ -139,10 +139,10 @@ func (c *RfqMmHttpClient) requestServer(method string, request interface{}) (str
 
 	body := bytes.NewBuffer(requestMsg)
 	req, err := http.NewRequest(method, c.Url, body)
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
 	if err != nil {
 		return "", err
 	}
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
 
 	for retry := 0; retry < 3; retry++ {
 		resp, err := c.Client.Do(req)
