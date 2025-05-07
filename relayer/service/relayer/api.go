@@ -32,7 +32,7 @@ func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceReques
 			request.SrcToken, request.DstToken, err)
 		return &proto.PriceResponse{Err: proto.NewErr(proto.ErrCode_ERROR_UNDEFINED, err.Error()).ToCommonErr()}, nil
 	}
-	request.BaseAmount = baseFee.String()
+	request.BaseFee = baseFee.String()
 
 	// todo: use srcReleaseAmount instead baseAmount to avoid rfq config change at onchain
 	response, err = clientPair.Price(ctx, request)
