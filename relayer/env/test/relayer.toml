@@ -4,9 +4,6 @@ url = "https://cbridge-stat.s3.us-west-2.amazonaws.com/test/cbridge-price.json"
 [rfqserver]
 url = ""
 
-[requestsigner]
-chainid = 5
-
 [relayer]
 port = 6676
 # in second

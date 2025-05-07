@@ -50,11 +50,6 @@ type AmountCalculator interface {
 	CalFixedCost(tokenIn, tokenOut *common.Token) (fixedCost *big.Int, fixedCostUsd float64, err error)
 }
 
-type RequestSigner interface {
-	Sign(data []byte) ([]byte, error)
-	Verify(data, sig []byte) bool
-}
-
 func NewClient(server string, ops ...grpc.DialOption) *Client {
 	conn, err := grpc.Dial(server, ops...)
 	if err != nil {
