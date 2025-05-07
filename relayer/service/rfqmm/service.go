@@ -140,7 +140,6 @@ func (c *RfqMmHttpClient) requestServer(method string, urlSuffix string, request
 	}
 
 	body := bytes.NewBuffer(requestMsg)
-	log.Infof("requestServer, body: %s", body.String())
 	req, err := http.NewRequest(method, c.Url+urlSuffix, body)
 	if err != nil {
 		log.Errorf("requestServer, fail to NewRequest, url: %s, body: %s, err: %v", c.Url+urlSuffix, body.String(), err)
