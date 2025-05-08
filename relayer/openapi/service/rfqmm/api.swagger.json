@@ -378,7 +378,7 @@
           "type": "boolean",
           "title": "indicates whether the user wants native token on the dst chain (only applicable if the dst token is a native wrap)"
         },
-        "baseAmount": {
+        "baseFee": {
           "type": "string"
         }
       }

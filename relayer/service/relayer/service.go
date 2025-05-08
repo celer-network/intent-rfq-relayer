@@ -41,6 +41,11 @@ const (
 	DefaultPortListenOn      int64 = 5565
 )
 
+const (
+	RpcMode = iota
+	HttpMode
+)
+
 type RfqRelayerServer struct {
 	Ctl                chan bool
 	ClientPairMap      map[string]*ClientPair
@@ -55,7 +60,9 @@ type ClientPair struct {
 	MmId            string
 	ApiKey          string
 	RfqServerClient rfqproto.MMApiClient
-	RfqMmClient     rfqmmproto.ApiClient
+	RfqMmClientMode int
+	RfqMmRpcClient  rfqmmproto.ApiClient
+	RfqMMHttpClient *rfqmm.RfqMmHttpClient
 }
 
 type RfqRelayerConfig struct {
@@ -63,10 +70,6 @@ type RfqRelayerConfig struct {
 	ReportRetryPeriod int64
 	// the period for processing pending orders
 	ProcessPeriod int64
-	// indicates the period for a price to be valid
-	PriceValidPeriod int64
-	// minimum dst transfer period, in order to give mm enough time for dst transfer
-	DstTransferPeriod int64
 	// port num that mm would listen on
 	Port  int64
 	DbUrl string
@@ -81,15 +84,6 @@ func (config *RfqRelayerConfig) clean() {
 		config.ProcessPeriod = DefaultProcessPeriod
 		log.Debugf("Got 0 ProcessPeriod, use default value(%d) instead.", DefaultProcessPeriod)
 	}
-	if config.PriceValidPeriod == 0 {
-		config.PriceValidPeriod = DefaultPriceValidPeriod
-		log.Debugf("Got 0 PriceValidPeriod, use default value(%d) instead.", DefaultPriceValidPeriod)
-	}
-	if config.DstTransferPeriod == 0 {
-		config.DstTransferPeriod = DefaultDstTransferPeriod
-		log.Debugf("Got 0 DstTransferPeriod, use default value(%d) instead.", DefaultDstTransferPeriod)
-	}
-
 	if config.Port == 0 {
 		config.Port = DefaultPortListenOn
 		log.Debugf("Got 0 PortListenOn, use default value(%d) instead.", DefaultPortListenOn)
@@ -177,14 +171,23 @@ func newClients(rfqServerUrl string, mmConfigs []*rfqmm.RfqMmConfig) map[string]
 	clientPairMap := make(map[string]*ClientPair)
 	for _, mmConfig := range mmConfigs {
 		rfqServerClient := rfqserver.NewClient(rfqServerUrl, mmConfig.ApiKey, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})))
-		opts := grpc.WithTransportCredentials(insecure.NewCredentials())
-		rfqMmClient := rfqmm.NewClient(mmConfig.Endpoint, opts)
-		clientPairMap[mmConfig.ApiKey] = &ClientPair{
+		clientPair := &ClientPair{
 			MmId:            mmConfig.MmId,
 			ApiKey:          mmConfig.ApiKey,
 			RfqServerClient: rfqServerClient,
-			RfqMmClient:     rfqMmClient,
 		}
+		if len(mmConfig.RpcEndpoint) != 0 {
+			// mm use rpc
+			opts := grpc.WithTransportCredentials(insecure.NewCredentials())
+			clientPair.RfqMmRpcClient = rfqmm.NewClient(mmConfig.RpcEndpoint, opts)
+			clientPair.RfqMmClientMode = RpcMode
+		} else {
+			// mm use http
+			clientPair.RfqMMHttpClient = rfqmm.NewHttpClient(mmConfig.HttpEndpoint)
+			clientPair.RfqMmClientMode = HttpMode
+		}
+
+		clientPairMap[mmConfig.ApiKey] = clientPair
 	}
 
 	return clientPairMap
@@ -211,7 +214,7 @@ func (s *RfqRelayerServer) ReportConfigs() {
 func (s *RfqRelayerServer) report(clientPair *ClientPair) {
 	var err error
 	for i := 0; i < 3; i++ {
-		response, err := clientPair.RfqMmClient.Tokens(context.Background(), &rfqmmproto.TokensRequest{})
+		response, err := clientPair.Tokens(context.Background(), &rfqmmproto.TokensRequest{})
 		if nil != err {
 			log.Warnf("report token config, fail to get tokens, mmId: %s, apiKey: %s, err: %v",
 				clientPair.MmId, clientPair.ApiKey, err)
@@ -340,7 +343,7 @@ func (s *RfqRelayerServer) processOrder(pendingOrder *rfqproto.PendingOrder, cli
 		}
 
 		// 4. get sig from mm
-		response, err := clientPair.RfqMmClient.SignQuoteHash(context.Background(), &rfqmmproto.SignQuoteHashRequest{
+		response, err := clientPair.SignQuoteHash(context.Background(), &rfqmmproto.SignQuoteHashRequest{
 			Quote:            pendingOrder.Quote,
 			SrcDepositTxHash: pendingOrder.SrcDepositTxHash,
 			QuoteSig:         pendingOrder.QuoteSig,
@@ -397,4 +400,32 @@ func (s *RfqRelayerServer) Serve(ops ...grpc.ServerOption) {
 	grpcServer := grpc.NewServer(ops...)
 	rfqmmproto.RegisterApiServer(grpcServer, s)
 	grpcServer.Serve(lis)
+}
+
+func (c *ClientPair) Price(ctx context.Context, request *rfqmmproto.PriceRequest) (*rfqmmproto.PriceResponse, error) {
+	if c.RfqMmClientMode == RpcMode {
+		return c.RfqMmRpcClient.Price(ctx, request)
+	}
+	return c.RfqMMHttpClient.Price(request)
+}
+
+func (c *ClientPair) Quote(ctx context.Context, request *rfqmmproto.QuoteRequest) (*rfqmmproto.QuoteResponse, error) {
+	if c.RfqMmClientMode == RpcMode {
+		return c.RfqMmRpcClient.Quote(ctx, request)
+	}
+	return c.RfqMMHttpClient.Quote(request)
+}
+
+func (c *ClientPair) SignQuoteHash(ctx context.Context, request *rfqmmproto.SignQuoteHashRequest) (*rfqmmproto.SignQuoteHashResponse, error) {
+	if c.RfqMmClientMode == RpcMode {
+		return c.RfqMmRpcClient.SignQuoteHash(ctx, request)
+	}
+	return c.RfqMMHttpClient.SignQuoteHash(request)
+}
+
+func (c *ClientPair) Tokens(ctx context.Context, request *rfqmmproto.TokensRequest) (*rfqmmproto.TokensResponse, error) {
+	if c.RfqMmClientMode == RpcMode {
+		return c.RfqMmRpcClient.Tokens(ctx, request)
+	}
+	return c.RfqMMHttpClient.Tokens(request)
 }

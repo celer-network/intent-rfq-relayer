@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/celer-network/goutils v0.1.56
+	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/miguelmota/go-solidity-sha3 v0.1.1
