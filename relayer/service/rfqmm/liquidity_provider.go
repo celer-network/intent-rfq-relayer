@@ -6,9 +6,9 @@ import (
 
 	ethutils "github.com/celer-network/goutils/eth"
 	"github.com/celer-network/goutils/log"
-	"github.com/celer-network/peti-rfq-relayer/relayer/bindings/rfq"
-	"github.com/celer-network/peti-rfq-relayer/relayer/eth"
-	"github.com/celer-network/peti-rfq-relayer/relayer/service/rfqmm/proto"
+	"github.com/celer-network/intent-rfq-relayer/relayer/bindings/rfq"
+	"github.com/celer-network/intent-rfq-relayer/relayer/eth"
+	"github.com/celer-network/intent-rfq-relayer/relayer/service/rfqmm/proto"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 )

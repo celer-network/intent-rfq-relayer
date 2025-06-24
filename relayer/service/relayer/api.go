@@ -2,14 +2,15 @@ package relayer
 
 import (
 	"context"
-	"google.golang.org/grpc/metadata"
 	"math"
 	"math/big"
 	"time"
 
+	"google.golang.org/grpc/metadata"
+
 	"github.com/celer-network/goutils/log"
-	"github.com/celer-network/peti-rfq-relayer/relayer/db"
-	"github.com/celer-network/peti-rfq-relayer/relayer/service/rfqmm/proto"
+	"github.com/celer-network/intent-rfq-relayer/relayer/db"
+	"github.com/celer-network/intent-rfq-relayer/relayer/service/rfqmm/proto"
 )
 
 func (s *RfqRelayerServer) Price(ctx context.Context, request *proto.PriceRequest) (response *proto.PriceResponse, err error) {

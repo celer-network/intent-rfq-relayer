@@ -3,7 +3,7 @@ package proto
 import (
 	"math/big"
 
-	"github.com/celer-network/peti-rfq-relayer/relayer/eth"
+	"github.com/celer-network/intent-rfq-relayer/relayer/eth"
 )
 
 func (r *PriceRequest) GetSrcAmt() *big.Int {

@@ -5,8 +5,8 @@ install:
 
 .PHONY: proto
 proto:
-	protoc --proto_path=./relayer/proto --go_out ./relayer --go_opt=module=github.com/celer-network/peti-rfq-relayer/relayer \
-	--go-grpc_out=./relayer --go-grpc_opt=require_unimplemented_servers=false,module=github.com/celer-network/peti-rfq-relayer/relayer \
-	--grpc-gateway_out=./relayer --grpc-gateway_opt=module=github.com/celer-network/peti-rfq-relayer/relayer \
+	protoc --proto_path=./relayer/proto --go_out ./relayer --go_opt=module=github.com/celer-network/intent-rfq-relayer/relayer \
+	--go-grpc_out=./relayer --go-grpc_opt=require_unimplemented_servers=false,module=github.com/celer-network/intent-rfq-relayer/relayer \
+	--grpc-gateway_out=./relayer --grpc-gateway_opt=module=github.com/celer-network/intent-rfq-relayer/relayer \
 	--openapiv2_out ./relayer/openapi \
 	./relayer/proto/service/*/*.proto

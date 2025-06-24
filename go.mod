@@ -1,4 +1,4 @@
-module github.com/celer-network/peti-rfq-relayer
+module github.com/celer-network/intent-rfq-relayer
 
 go 1.18
 

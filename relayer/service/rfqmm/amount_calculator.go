@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/celer-network/goutils/log"
-	"github.com/celer-network/peti-rfq-relayer/relayer/common"
+	"github.com/celer-network/intent-rfq-relayer/relayer/common"
 )
 
 var _ AmountCalculator = &DefaultAmtCalculator{}

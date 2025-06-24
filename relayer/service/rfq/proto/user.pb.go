@@ -9,12 +9,13 @@
 package proto
 
 import (
-	common "github.com/celer-network/peti-rfq-relayer/relayer/common"
-	proto "github.com/celer-network/peti-rfq-relayer/relayer/service/rfqmm/proto"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
+
+	common "github.com/celer-network/intent-rfq-relayer/relayer/common"
+	proto "github.com/celer-network/intent-rfq-relayer/relayer/service/rfqmm/proto"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (

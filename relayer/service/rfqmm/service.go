@@ -3,18 +3,19 @@ package rfqmm
 import (
 	"bytes"
 	"encoding/json"
-	"google.golang.org/grpc"
 	"io/ioutil"
 	"math/big"
 	"net/http"
 	"strings"
 	"time"
 
+	"google.golang.org/grpc"
+
 	"github.com/celer-network/goutils/log"
-	"github.com/celer-network/peti-rfq-relayer/relayer/common"
-	"github.com/celer-network/peti-rfq-relayer/relayer/eth"
-	rfqproto "github.com/celer-network/peti-rfq-relayer/relayer/service/rfq/proto"
-	"github.com/celer-network/peti-rfq-relayer/relayer/service/rfqmm/proto"
+	"github.com/celer-network/intent-rfq-relayer/relayer/common"
+	"github.com/celer-network/intent-rfq-relayer/relayer/eth"
+	rfqproto "github.com/celer-network/intent-rfq-relayer/relayer/service/rfq/proto"
+	"github.com/celer-network/intent-rfq-relayer/relayer/service/rfqmm/proto"
 	"github.com/gogo/protobuf/jsonpb"
 )
 

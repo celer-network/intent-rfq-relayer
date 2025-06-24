@@ -9,9 +9,9 @@ import (
 	"sync"
 
 	ethutils "github.com/celer-network/goutils/eth"
-	"github.com/celer-network/peti-rfq-relayer/relayer/common"
-	"github.com/celer-network/peti-rfq-relayer/relayer/eth"
-	"github.com/celer-network/peti-rfq-relayer/relayer/service/rfqmm/proto"
+	"github.com/celer-network/intent-rfq-relayer/relayer/common"
+	"github.com/celer-network/intent-rfq-relayer/relayer/eth"
+	"github.com/celer-network/intent-rfq-relayer/relayer/service/rfqmm/proto"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/crypto"
 )

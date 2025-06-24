@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/celer-network/peti-rfq-relayer/relayer/service/relayer"
 	"os"
 	"path/filepath"
+
+	"github.com/celer-network/intent-rfq-relayer/relayer/service/relayer"
 
 	"github.com/celer-network/goutils/log"
 	"github.com/spf13/cobra"
@@ -27,7 +28,7 @@ func main() {
 
 func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "peti-rfq-relayer",
+		Use:   "intent-rfq-relayer",
 		Short: "rfq relayer",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			home, err := cmd.Flags().GetString(FlagHome)
@@ -46,9 +47,9 @@ func NewRootCmd() *cobra.Command {
 			return nil
 		},
 	}
-	rootCmd.PersistentFlags().String(FlagHome, os.ExpandEnv("$HOME/.peti-rfq-relayer"), "home path")
+	rootCmd.PersistentFlags().String(FlagHome, os.ExpandEnv("$HOME/.intent-rfq-relayer"), "home path")
 	rootCmd.PersistentFlags().String(FlagLoglevel, "info", "log level")
-	rootCmd.PersistentFlags().String(FlagLogDir, "$HOME/.peti-rfq-relayer/app", "log level")
+	rootCmd.PersistentFlags().String(FlagLogDir, "$HOME/.intent-rfq-relayer/app", "log level")
 	rootCmd.AddCommand(
 		startCmd(),
 	)

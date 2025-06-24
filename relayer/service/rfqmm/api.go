@@ -2,11 +2,12 @@ package rfqmm
 
 import (
 	"context"
-	"google.golang.org/grpc"
 	"math/big"
 	"time"
 
-	"github.com/celer-network/peti-rfq-relayer/relayer/service/rfqmm/proto"
+	"google.golang.org/grpc"
+
+	"github.com/celer-network/intent-rfq-relayer/relayer/service/rfqmm/proto"
 )
 
 func (c *Client) Price(ctx context.Context, in *proto.PriceRequest, opts ...grpc.CallOption) (*proto.PriceResponse, error) {
